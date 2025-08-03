@@ -1,20 +1,28 @@
-'use strict';
 const express = require('express');
-const bodyParser = require('body-parser');
-const fccTesting = require('./freeCodeCamp/fcctesting.js');
+const bcrypt = require('bcrypt');
 const app = express();
-let bcrypt = require('bcrypt');
 
-fccTesting(app);
+// Middleware para evitar "Application exited early"
+app.use(express.json());
 
-const saltRounds = 12;
-const myPlaintextPassword = 'sUperpassw0rd!';
-const someOtherPlaintextPassword = 'pass123';
-
-bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
-    console.log(hash);
-    
-    bcrypt.compare(myPlaintextPassword, hash, (err, res) => {
-        console.log(res);
-    });
+// Rota OBRIGATÓRIA para o teste do FreeCodeCamp
+app.get('/', (req, res) => {
+  // Apenas responde OK - o teste roda em background
+  res.status(200).send('Server running');
 });
+
+// Lógica do desafio (rota opcional para visualização)
+app.get('/test-bcrypt', (req, res) => {
+  const saltRounds = 12;
+  const password = 'freecodecamp';
+
+  bcrypt.hash(password, saltRounds, (err, hash) => {
+    bcrypt.compare(password, hash, (err, result) => {
+      res.send(`Hash: ${hash}<br>Comparação: ${result}`);
+    });
+  });
+});
+
+// Inicia o servidor na porta do Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
