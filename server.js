@@ -1,27 +1,27 @@
-const bcrypt = require('bcrypt');
-const saltRounds = 10; // Você pode ajustar este valor conforme necessário
+'use strict';
+const express = require('express');
+const bodyParser = require('body-parser');
+const fccTesting = require('./freeCodeCamp/fcctesting.js');
+const app = express();
+let bcrypt = require('bcrypt');
 
-// Gerar o hash da senha
-bcrypt.hash('passw0rd!', saltRounds, (err, hash) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  
-  console.log('Hash gerado:', hash);
-  
-  // Comparar a senha com o hash gerado
-  bcrypt.compare('passw0rd!', hash, (err, res) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
+fccTesting(app);
+
+const saltRounds = 12;
+const myPlaintextPassword = 'sUperpassw0rd!';
+const someOtherPlaintextPassword = 'pass123';
+
+// Corrected the arrow function syntax from "+>" to "=>"
+bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
+    console.log(hash);
     
-    console.log('Resultado da comparação (deve ser true):', res);
-    
-    // Testar com senha incorreta
-    bcrypt.compare('senha_errada', hash, (err, res) => {
-      console.log('Resultado da comparação (deve ser false):', res);
+    bcrypt.compare(myPlaintextPassword, hash, (err, res) => {
+        console.log(res);
     });
-  });
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
 });
