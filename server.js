@@ -1,25 +1,34 @@
+'use strict';
 const express = require('express');
 const bcrypt = require('bcrypt');
 const app = express();
 
-// Middleware CRUCIAL para o FreeCodeCamp
-app.use(express.urlencoded({ extended: true }));
+// Variáveis DEFINIDAS PELO FREECODECAMP (não altere os nomes!)
+const saltRounds = 12;
+const myPlaintextPassword = 'sUperpassw0rd!';
+const someOtherPlaintextPassword = 'pass123';
 
-// Rota que o FreeCodeCamp testa
-app.post('/hash-route', (req, res) => {
-  const { password } = req.body;
-  const saltRounds = 12;
-  
-  bcrypt.hash(password, saltRounds, (err, hash) => {
-    bcrypt.compare(password, hash, (err, result) => {
-      res.json({ hash, comparison: result }); // Formato que o FCC espera
+// Middleware para evitar erros
+app.use(express.json());
+
+// Rota raiz OBRIGATÓRIA (o FCC testa isso)
+app.get('/', (req, res) => {
+  // Executa o hash E a comparação CONFORME PEDIDO
+  bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
+    console.log('Hash gerado:', hash); // 1. Log do hash
+    
+    bcrypt.compare(myPlaintextPassword, hash, (err, result) => {
+      console.log('Comparação (senha correta):', result); // 2. Log true
+    });
+    
+    bcrypt.compare(someOtherPlaintextPassword, hash, (err, result) => {
+      console.log('Comparação (senha errada):', result); // 3. Log false
     });
   });
+  
+  res.send('Server running - check console logs for hash and comparison');
 });
 
-// Rota raiz opcional (só para verificar se está online)
-app.get('/', (req, res) => res.send('Server running'));
-
-// Porta dinâmica para o Render
+// Inicia o servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Running on ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
