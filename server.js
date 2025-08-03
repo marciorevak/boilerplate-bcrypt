@@ -3,40 +3,30 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const app = express();
 
-// Variáveis DEFINIDAS PELO FREECODECAMP
+// Variáveis EXATAS que o FreeCodeCamp espera
 const saltRounds = 12;
 const myPlaintextPassword = 'sUperpassw0rd!';
 const someOtherPlaintextPassword = 'pass123';
 
-app.use(express.json());
-
-// Rota principal OBRIGATÓRIA (o FCC verifica isso)
+// Rota principal OBRIGATÓRIA
 app.get('/', (req, res) => {
-  res.send('Server running - access /fcc-test for verification');
-});
-
-// Rota específica para o teste do FreeCodeCamp
-app.get('/fcc-test', (req, res) => {
+  // Executa o teste de hash/comparação
   bcrypt.hash(myPlaintextPassword, saltRounds, (err, hash) => {
-    if (err) return res.status(500).send('Hash error');
+    if (err) return console.error('Hash error:', err);
     
-    console.log('Hash:', hash); // Log obrigatório para o FCC
+    console.log('Hash:', hash); // Obrigatório
     
-    bcrypt.compare(myPlaintextPassword, hash, (err, result1) => {
-      console.log('Correct comparison:', result1); // Deve ser true
-      
-      bcrypt.compare(someOtherPlaintextPassword, hash, (err, result2) => {
-        console.log('Incorrect comparison:', result2); // Deve be false
-        
-        res.json({
-          hash: hash,
-          correctMatch: result1,
-          incorrectMatch: result2
-        });
-      });
+    bcrypt.compare(myPlaintextPassword, hash, (err, result) => {
+      console.log('Comparison (correct):', result); // Deve ser true
+    });
+    
+    bcrypt.compare(someOtherPlaintextPassword, hash, (err, result) => {
+      console.log('Comparison (incorrect):', result); // Deve ser false
     });
   });
+  
+  res.send('Server running - check Render logs for test results');
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Running on port ${PORT}`));
